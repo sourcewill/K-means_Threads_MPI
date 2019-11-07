@@ -95,7 +95,7 @@ void importa_pontos(FILE* entrada){
     PONTO ponto;
 
     linhas = num_linhas(entrada);
-    PONTOS = (CENTROIDE*)malloc(linhas * sizeof(CENTROIDE));
+    PONTOS = (PONTO*)malloc(linhas * sizeof(PONTO));
 
     fseek(entrada,0,SEEK_SET);
     for(i=0; i<linhas; i++){
