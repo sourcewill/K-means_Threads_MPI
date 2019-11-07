@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 
 // STRUCTS
@@ -21,7 +22,6 @@ int NUM_CENTROIDES = 0;
 int NUM_PONTOS = 0;
 CENTROIDE* CENTROIDES;
 PONTO* PONTOS;
-
 
 // Recebe as coordenadas de um Centroide e inicializa o mesmo
 CENTROIDE inicializaCentroide(int* coord){
@@ -114,6 +114,46 @@ void importa_pontos(FILE* entrada){
 }
 
 
+// Retorna a distancia entre um centroide e um ponto
+int distacia_centroide_ponto(CENTROIDE centroide, PONTO ponto){
+
+    int i, diferenca, somatorio = 0, raiz;
+    for(i=0; i<BASE; i++){
+        diferenca = centroide.coordenadas[i] - ponto.coordenadas[i];
+        somatorio += pow(diferenca, 2); // pow determina o expoente
+    }
+    raiz = floor(sqrt(somatorio)); // floor arredonda para baixo
+    return raiz;
+}
+
+
+// Atualiza o campo id_centroide de um ponto
+void atualiza_centroide_mais_proximo(PONTO *ponto){
+
+    int i, distancia_atual, menor_distancia = 999999999;
+
+    for(i=0; i<NUM_CENTROIDES; i++){
+        distancia_atual = distacia_centroide_ponto(CENTROIDES[i], *ponto);
+        if(distancia_atual < menor_distancia){
+            menor_distancia = distancia_atual;
+            ponto->id_centroide = i;
+        }
+    }
+}
+
+
+void K_means(){
+
+    int i, centroide;
+    for(i=0; i<NUM_PONTOS; i++){
+        atualiza_centroide_mais_proximo(&PONTOS[i]);
+    }
+
+    // Recalcular coordenadas dos centroides e repetir o processo
+
+}
+
+
 int main(){
 
     BASE = 59;
@@ -127,5 +167,8 @@ int main(){
 
     fclose(arq_centroides);
     fclose(arq_pontos);
+
+    K_means();
+
     return 0;
 }
