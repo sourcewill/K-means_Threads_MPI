@@ -155,7 +155,7 @@ int distacia_centroide_ponto(CENTROIDE centroide, PONTO ponto){
 void atualiza_centroide_mais_proximo(PONTO *ponto){
 
     CENTROIDE* centroide;
-    int i, j, distancia_atual, menor_distancia = 999999999, indice;
+    int i, distancia_atual, menor_distancia = 999999999, indice;
 
     for(i=0; i<NUM_CENTROIDES; i++){
         distancia_atual = distacia_centroide_ponto(CENTROIDES[i], *ponto);
@@ -168,8 +168,8 @@ void atualiza_centroide_mais_proximo(PONTO *ponto){
     ponto->id_centroide = indice;
     centroide = &CENTROIDES[indice];
     centroide->num_associados++;
-    for(j=0; j<BASE; j++){
-        centroide->soma_pontos_associados[j] += ponto->coordenadas[j];
+    for(i=0; i<BASE; i++){
+        centroide->soma_pontos_associados[i] += ponto->coordenadas[i];
     }
 }
 
