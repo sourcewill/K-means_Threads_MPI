@@ -18,10 +18,7 @@ typedef struct{
 
 
 // GLOBAL
-int geraId = 0;
-int BASE;
-int NUM_CENTROIDES = 0;
-int NUM_PONTOS = 0;
+int geraId = 0, BASE, NUM_CENTROIDES = 0, NUM_PONTOS = 0;
 CENTROIDE* CENTROIDES;
 PONTO* PONTOS;
 
@@ -160,14 +157,45 @@ void atualiza_centroide_mais_proximo(PONTO *ponto){
 }
 
 
+void reinicia_vars_centroide(CENTROIDE* centroide){
+    int i;
+    centroide->num_associados = 0;
+    for(i=0; i<BASE; i++){
+        centroide->soma_pontos_associados[i] = 0;
+    }
+}
+
+
 void K_means(){
 
-    int i, centroide;
-    for(i=0; i<NUM_PONTOS; i++){
-        atualiza_centroide_mais_proximo(&PONTOS[i]);
-    }
+    int i, j, media, FLAG_ATUALIZOU = 1, associados;
+    CENTROIDE* centroide;
 
-    // Recalcular coordenadas dos centroides e repetir o processo
+    while(FLAG_ATUALIZOU){
+
+        FLAG_ATUALIZOU = 0;
+
+        for(i=0; i<NUM_PONTOS; i++){
+            atualiza_centroide_mais_proximo(&PONTOS[i]);
+        }
+
+        // Recalcular coordenadas dos centroides
+        for(i=0; i<NUM_CENTROIDES; i++){
+            centroide = &CENTROIDES[i];
+            associados = centroide->num_associados;
+            for(j=0; j<BASE; j++){
+                if(associados > 0){
+                    media = centroide->soma_pontos_associados[j] / associados;
+                    if(media != centroide->coordenadas[j]){
+                        FLAG_ATUALIZOU = 1;
+                    }
+                    centroide->coordenadas[j] = media;
+                }
+            }
+        }
+
+        reinicia_vars_centroide(centroide);
+    }
 }
 
 
@@ -186,12 +214,6 @@ int main(){
     fclose(arq_pontos);
 
     K_means();
-
-    int i;
-    for(i=0; i<BASE; i++){
-        printf("\nSoma[%d] %d\n", i, CENTROIDES[19].soma_pontos_associados[i]);
-    }
-
 
     return 0;
 }
