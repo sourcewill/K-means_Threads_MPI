@@ -22,6 +22,7 @@ typedef struct{
 // GLOBAL
 int geraId = 0, BASE, NUM_CENTROIDES = 0, NUM_PONTOS = 0, NTH;
 pthread_mutex_t MUT = PTHREAD_MUTEX_INITIALIZER;
+pthread_barrier_t BARREIRA;
 CENTROIDE* CENTROIDES;
 PONTO* PONTOS;
 
@@ -190,7 +191,7 @@ void reinicia_vars_centroide(CENTROIDE* centroide){
 
 void* K_means(void* arg){
 
-    int i, j, media, FLAG_ATUALIZOU = 1, associados;
+    int i, j, media, FLAG_ATUALIZOU = 1, associados, wait_1, wait_2;
     CENTROIDE* centroide;
     long int id_thread;
     id_thread = (long int) arg;
@@ -199,14 +200,18 @@ void* K_means(void* arg){
 
     while(FLAG_ATUALIZOU){
 
+        printf("\nthread %d no while\n", (int)arg);
+
         FLAG_ATUALIZOU = 0;
 
         for(i = id_thread; i<NUM_PONTOS; i += NTH){
             atualiza_centroide_mais_proximo(&PONTOS[i]);
         }
 
-        // BARREIRA <----------------
+        // BARREIRA
+        pthread_barrier_wait(&BARREIRA);
 
+        printf("\nthread %d na barreira 1",(int)arg);
         // Recalcular coordenadas dos centroides
         for(i = id_thread; i<NUM_CENTROIDES; i += NTH){
             centroide = &CENTROIDES[i];
@@ -222,9 +227,13 @@ void* K_means(void* arg){
             }
         }
 
-        // BARREIRA <----------------
+        // BARREIRA
+        pthread_barrier_wait(&BARREIRA);
 
+        printf("\nthread %d na barreira 2",(int)arg);
         reinicia_vars_centroide(centroide);
+
+        pthread_barrier_wait(&BARREIRA);
     }
 }
 
@@ -250,6 +259,7 @@ int main(int argc, char* argv[]){
     fclose(arq_centroides);
     fclose(arq_pontos);
 
+    pthread_barrier_init(&BARREIRA,NULL,NTH);
     pthread_t* threads = (pthread_t *) malloc(NTH * sizeof(pthread_t));
 
     long int i;
