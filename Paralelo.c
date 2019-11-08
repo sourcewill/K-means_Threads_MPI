@@ -205,7 +205,7 @@ void* K_means(void* arg){
         // BARREIRA <----------------
 
         // Recalcular coordenadas dos centroides
-        for(i=0; i<NUM_CENTROIDES; i++){
+        for(i = id_thread; i<NUM_CENTROIDES; i += NTH){
             centroide = &CENTROIDES[i];
             associados = centroide->num_associados;
             for(j=0; j<BASE; j++){
@@ -218,6 +218,8 @@ void* K_means(void* arg){
                 }
             }
         }
+
+        // BARREIRA <----------------
 
         reinicia_vars_centroide(centroide);
     }
