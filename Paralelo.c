@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
+#include <pthread.h>
 
 
 // STRUCTS
@@ -20,6 +21,7 @@ typedef struct{
 
 // GLOBAL
 int geraId = 0, BASE, NUM_CENTROIDES = 0, NUM_PONTOS = 0, NTH;
+pthread_mutex_t MUT = PTHREAD_MUTEX_INITIALIZER;
 CENTROIDE* CENTROIDES;
 PONTO* PONTOS;
 
@@ -155,7 +157,7 @@ int distacia_centroide_ponto(CENTROIDE centroide, PONTO ponto){
 void atualiza_centroide_mais_proximo(PONTO *ponto){
 
     CENTROIDE* centroide;
-    int i, j, distancia_atual, menor_distancia = 999999999, indice;
+    int i, distancia_atual, menor_distancia = 999999999, indice;
 
     for(i=0; i<NUM_CENTROIDES; i++){
         distancia_atual = distacia_centroide_ponto(CENTROIDES[i], *ponto);
@@ -167,12 +169,13 @@ void atualiza_centroide_mais_proximo(PONTO *ponto){
     // Atualiza ponto e centroide
     ponto->id_centroide = indice;
     centroide = &CENTROIDES[indice];
-    // LOCK() <----------------
+
+    pthread_mutex_lock(&MUT); // LOCK
     centroide->num_associados++;
-    for(j=0; j<BASE; j++){
-        centroide->soma_pontos_associados[j] += ponto->coordenadas[j];
+    for(i=0; i<BASE; i++){
+        centroide->soma_pontos_associados[i] += ponto->coordenadas[i];
     }
-    // UNLOCK() <----------------
+    pthread_mutex_unlock(&MUT); // UNLOCK
 }
 
 
