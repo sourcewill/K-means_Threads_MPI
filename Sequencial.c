@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <string.h>
 
 
 // STRUCTS
@@ -118,6 +119,22 @@ void importa_pontos(FILE* entrada){
 }
 
 
+// Escreve no arquivo de saida todas as coordenadas atuais dos centroides
+void escreve_arq_saida(FILE * arq_saida){
+
+    int i, j;
+    for(i=0; i<NUM_CENTROIDES; i++){
+        for(j=0; j<BASE; j++){
+            fprintf(arq_saida, "%d", CENTROIDES[i].coordenadas[j]);
+            if(j<BASE-1){
+                fprintf(arq_saida, ",");
+            }
+        }
+        fprintf(arq_saida, "\n");
+    }
+}
+
+
 // Retorna a distancia entre um centroide e um ponto
 int distacia_centroide_ponto(CENTROIDE centroide, PONTO ponto){
 
@@ -202,7 +219,8 @@ void K_means(){
 int main(){
 
     BASE = 59;
-    FILE *arq_centroides, *arq_pontos;
+    FILE *arq_centroides, *arq_pontos, *arq_saida;
+    char buffer[20]="out_centroid_", str_base[20];
 
     arq_centroides = fopen("int_bases/int_centroid_59_20.data", "rb");
     arq_pontos = fopen("int_bases/int_base_59.data", "rb");
@@ -214,6 +232,12 @@ int main(){
     fclose(arq_pontos);
 
     K_means();
+
+    itoa(BASE, str_base, 10);
+    strcat(buffer, str_base);
+    arq_saida = fopen(buffer, "w");
+    escreve_arq_saida(arq_saida);
+    fclose(arq_saida);
 
     return 0;
 }
