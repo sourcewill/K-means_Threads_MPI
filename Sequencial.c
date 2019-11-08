@@ -7,6 +7,8 @@
 typedef struct{
     int * coordenadas;
     int id;
+    int * soma_pontos_associados;
+    int num_associados;
 }CENTROIDE;
 
 typedef struct{
@@ -23,15 +25,17 @@ int NUM_PONTOS = 0;
 CENTROIDE* CENTROIDES;
 PONTO* PONTOS;
 
+
 // Recebe as coordenadas de um Centroide e inicializa o mesmo
-CENTROIDE inicializaCentroide(int* coord){
+CENTROIDE inicializaCentroide(int* coord, int* soma_pontos){
     CENTROIDE centroide;
     centroide.coordenadas = coord;
     centroide.id = geraId++;
+    centroide.soma_pontos_associados = soma_pontos;
+    centroide.num_associados = 0;
     NUM_CENTROIDES++;
     return centroide;
 }
-
 
 // Recebe as coordenadas de um Ponto e inicializa o mesmo
 PONTO inicializaPonto(int* coord){
@@ -62,7 +66,7 @@ void importa_centroides(FILE* entrada){
 
     printf("\nImportando Centroides...\n");
 
-    int *coordenadas, i, j, num, linhas;
+    int *coordenadas, *soma_pontos, i, j, num, linhas;
     CENTROIDE centroide;
 
     linhas = num_linhas(entrada);
@@ -71,12 +75,14 @@ void importa_centroides(FILE* entrada){
     fseek(entrada,0,SEEK_SET);
     for(i=0; i<linhas; i++){
         coordenadas = (int*) malloc(BASE * sizeof(int));
+        soma_pontos = (int*) malloc(BASE * sizeof(int));
         for(j=0; j<BASE; j++){
             fscanf(entrada, "%d", &num);
             coordenadas[j] = num;
             fseek(entrada,1,SEEK_CUR);
+            soma_pontos[j] = 0;
         }
-        centroide = inicializaCentroide(coordenadas);
+        centroide = inicializaCentroide(coordenadas, soma_pontos);
         CENTROIDES[i] = centroide;
 
     }
@@ -86,7 +92,8 @@ void importa_centroides(FILE* entrada){
 
 
 // Importa PONTOS com base em um arquivo de texto
-// Cada linha do arquivo representa as coordenadas de um Ponto
+// Cada linha do arquivo representa as coordenadas de um Ponto separadas por uma virgula
+// A ultima linha do arquivo deve estar em branco
 void importa_pontos(FILE* entrada){
 
     printf("\nImportando Pontos...\n");
@@ -103,7 +110,7 @@ void importa_pontos(FILE* entrada){
         for(j=0; j<BASE; j++){
             fscanf(entrada, "%d", &num);
             coordenadas[j] = num;
-            fseek(entrada,1,SEEK_CUR);
+            fseek(entrada,1,SEEK_CUR); // Pula a virgula
         }
         ponto = inicializaPonto(coordenadas);
         PONTOS[i] = ponto;
@@ -127,17 +134,28 @@ int distacia_centroide_ponto(CENTROIDE centroide, PONTO ponto){
 }
 
 
-// Atualiza o campo id_centroide de um ponto
+// Busca o centroide mais proximo do ponto atual
+// Atualiza o campo id_centroide do ponto com id do centroide mais proximo
+// Incrementa o campo num_associados do centroide
+// Incrementa todo vetor soma_pontos_associados do centroide com as coordenadas do ponto atual
 void atualiza_centroide_mais_proximo(PONTO *ponto){
 
-    int i, distancia_atual, menor_distancia = 999999999;
+    CENTROIDE* centroide;
+    int i, j, distancia_atual, menor_distancia = 999999999, indice;
 
     for(i=0; i<NUM_CENTROIDES; i++){
         distancia_atual = distacia_centroide_ponto(CENTROIDES[i], *ponto);
         if(distancia_atual < menor_distancia){
             menor_distancia = distancia_atual;
-            ponto->id_centroide = i;
+            indice = i;
         }
+    }
+    // Atualiza ponto e centroide
+    ponto->id_centroide = indice;
+    centroide = &CENTROIDES[indice];
+    centroide->num_associados++;
+    for(j=0; j<BASE; j++){
+        centroide->soma_pontos_associados[j] += ponto->coordenadas[j];
     }
 }
 
@@ -150,7 +168,6 @@ void K_means(){
     }
 
     // Recalcular coordenadas dos centroides e repetir o processo
-
 }
 
 
@@ -169,6 +186,12 @@ int main(){
     fclose(arq_pontos);
 
     K_means();
+
+    int i;
+    for(i=0; i<BASE; i++){
+        printf("\nSoma[%d] %d\n", i, CENTROIDES[19].soma_pontos_associados[i]);
+    }
+
 
     return 0;
 }
