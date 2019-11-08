@@ -188,6 +188,8 @@ void K_means(){
     int i, j, media, FLAG_ATUALIZOU = 1, associados;
     CENTROIDE* centroide;
 
+    printf("\nProcessando algoritmo K-means...\n");
+
     while(FLAG_ATUALIZOU){
 
         FLAG_ATUALIZOU = 0;
@@ -216,14 +218,19 @@ void K_means(){
 }
 
 
-int main(){
+int main(int argc, char* argv[]){
 
-    BASE = 59;
+    if(argc < 2){
+        printf("Sao necessarios 3 prametros:\nbase | arq_centroides | arq_pontos\n");
+        exit(1);
+    }
+
+    BASE = atoi(argv[1]);
     FILE *arq_centroides, *arq_pontos, *arq_saida;
-    char buffer[20]="out_centroid_", str_base[20];
+    char nome_arq_saida[20]="out_centroid_base_";
 
-    arq_centroides = fopen("int_bases/int_centroid_59_20.data", "rb");
-    arq_pontos = fopen("int_bases/int_base_59.data", "rb");
+    arq_centroides = fopen(argv[2], "rb");
+    arq_pontos = fopen(argv[3], "rb");
 
     importa_centroides(arq_centroides);
     importa_pontos(arq_pontos);
@@ -233,10 +240,10 @@ int main(){
 
     K_means();
 
-    itoa(BASE, str_base, 10);
-    strcat(buffer, str_base);
-    arq_saida = fopen(buffer, "w");
+    strcat(nome_arq_saida, argv[1]);
+    arq_saida = fopen(nome_arq_saida, "w");
     escreve_arq_saida(arq_saida);
+    printf("\nArquivo '%s' criado no atual diretorio.\n", nome_arq_saida);
     fclose(arq_saida);
 
     return 0;
