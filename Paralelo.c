@@ -3,6 +3,7 @@
 #include <math.h>
 #include <string.h>
 #include <pthread.h>
+#include <time.h>
 
 
 // STRUCTS
@@ -196,7 +197,7 @@ void* K_means(void* arg){
     long int id_thread;
     id_thread = (long int) arg;
 
-    printf("\nProcessando algoritmo K-means...\n");
+    printf("\nThread(%ld) processando algoritmo K-means...", id_thread);
 
     while(FLAG_ATUALIZOU){
 
@@ -245,7 +246,7 @@ int main(int argc, char* argv[]){
     NTH = atoi(argv[4]);
     BASE = atoi(argv[1]);
     FILE *arq_centroides, *arq_pontos, *arq_saida;
-    char nome_arq_saida[20]="out_centroid_base_";
+    char nome_arq_saida[50]="out_centroid_base_";
 
     arq_centroides = fopen(argv[2], "rb");
     arq_pontos = fopen(argv[3], "rb");
@@ -259,6 +260,9 @@ int main(int argc, char* argv[]){
     pthread_barrier_init(&BARREIRA,NULL,NTH);
     pthread_t* threads = (pthread_t *) malloc(NTH * sizeof(pthread_t));
 
+    clock_t tempo;
+    tempo = clock(); // Inicia cronometro
+
     long int i;
     for(i=0; i<NTH; i++){
         pthread_create(&threads[i],NULL,K_means,(void*)i);
@@ -268,11 +272,15 @@ int main(int argc, char* argv[]){
         pthread_join(threads[i],NULL);
     }
 
+    tempo = clock() - tempo; // Finaliza cronometro
+
     strcat(nome_arq_saida, argv[1]);
     arq_saida = fopen(nome_arq_saida, "w");
     escreve_arq_saida(arq_saida);
-    printf("\nArquivo '%s' criado no atual diretorio.\n", nome_arq_saida);
+    printf("\n\nArquivo '%s' criado no atual diretorio.", nome_arq_saida);
     fclose(arq_saida);
+
+    printf("\nTempo de execucao: %lf segundos.\n", (((double)tempo)/((CLOCKS_PER_SEC/1000)))/1000);
 
     return 0;
 }
