@@ -141,7 +141,7 @@ int distacia_centroide_ponto(CENTROIDE centroide, PONTO ponto){
     int i, diferenca, somatorio = 0, raiz;
     for(i=0; i<BASE; i++){
         diferenca = centroide.coordenadas[i] - ponto.coordenadas[i];
-        somatorio += pow(diferenca, 2); // pow determina o expoente
+        somatorio += (diferenca * diferenca);
     }
     raiz = floor(sqrt(somatorio)); // floor arredonda para baixo
     return raiz;
@@ -204,16 +204,15 @@ void K_means(){
             associados = centroide->num_associados;
             for(j=0; j<BASE; j++){
                 if(associados > 0){
-                    media = centroide->soma_pontos_associados[j] / associados;
+                    media = floor(centroide->soma_pontos_associados[j] / associados);
                     if(media != centroide->coordenadas[j]){
                         FLAG_ATUALIZOU = 1;
                     }
                     centroide->coordenadas[j] = media;
                 }
             }
+            reinicia_vars_centroide(centroide);
         }
-
-        reinicia_vars_centroide(centroide);
     }
 }
 
