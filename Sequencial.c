@@ -153,7 +153,7 @@ int distacia_centroide_ponto(CENTROIDE centroide, PONTO ponto){
 // Atualiza o campo id_centroide do ponto com id do centroide mais proximo
 // Incrementa o campo num_associados do centroide
 // Incrementa todo vetor soma_pontos_associados do centroide com as coordenadas do ponto atual
-void atualiza_centroide_mais_proximo(PONTO *ponto){
+void atualiza_centroide_mais_proximo(PONTO* ponto){
 
     CENTROIDE* centroide;
     int i, distancia_atual, menor_distancia = 999999999, indice;
@@ -175,6 +175,25 @@ void atualiza_centroide_mais_proximo(PONTO *ponto){
 }
 
 
+// Retorna a flag informando se houve atualizacao nas coordenadas do centroide
+int recalcula_coordenadas_centroide(CENTROIDE* centroide){
+
+    int atualizou = 0, num_associados, i, media;
+
+    num_associados = centroide->num_associados;
+    for(i=0; i<BASE; i++){
+        if(num_associados > 0){
+            media = floor(centroide->soma_pontos_associados[i] / num_associados);
+            if(media != centroide->coordenadas[i]){
+                atualizou = 1;
+                centroide->coordenadas[i] = media;
+            }
+        }
+    }
+    return atualizou;
+}
+
+
 void reinicia_vars_centroide(CENTROIDE* centroide){
     int i;
     centroide->num_associados = 0;
@@ -186,7 +205,7 @@ void reinicia_vars_centroide(CENTROIDE* centroide){
 
 void K_means(){
 
-    int i, j, media, FLAG_ATUALIZOU = 1, associados;
+    int i, FLAG_ATUALIZOU = 1;
     CENTROIDE* centroide;
 
     printf("\nProcessando algoritmo K-means sequencial...");
@@ -202,16 +221,7 @@ void K_means(){
         // Recalcular coordenadas dos centroides
         for(i=0; i<NUM_CENTROIDES; i++){
             centroide = &CENTROIDES[i];
-            associados = centroide->num_associados;
-            for(j=0; j<BASE; j++){
-                if(associados > 0){
-                    media = floor(centroide->soma_pontos_associados[j] / associados);
-                    if(media != centroide->coordenadas[j]){
-                        FLAG_ATUALIZOU = 1;
-                    }
-                    centroide->coordenadas[j] = media;
-                }
-            }
+            FLAG_ATUALIZOU = recalcula_coordenadas_centroide(centroide);
             reinicia_vars_centroide(centroide);
         }
     }
