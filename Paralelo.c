@@ -218,11 +218,7 @@ void* K_means(void* arg){
 
     printf("\nThread(%ld) processando algoritmo K-means...", id_thread);
 
-    while(FLAG_ATUALIZOU){
-
-        // BARREIRA
-        pthread_barrier_wait(&BARREIRA);
-
+    do{
         FLAG_ATUALIZOU = 0;
 
         for(i = id_thread; i<NUM_PONTOS; i += NTH){
@@ -243,7 +239,8 @@ void* K_means(void* arg){
 
         // BARREIRA
         pthread_barrier_wait(&BARREIRA);
-    }
+    } while(FLAG_ATUALIZOU);
+
     pthread_exit(0);
 }
 
