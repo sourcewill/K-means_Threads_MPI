@@ -221,7 +221,9 @@ void K_means(){
         // Recalcular coordenadas dos centroides
         for(i=0; i<NUM_CENTROIDES; i++){
             centroide = &CENTROIDES[i];
-            FLAG_ATUALIZOU = recalcula_coordenadas_centroide(centroide);
+            if(recalcula_coordenadas_centroide(centroide)){
+                FLAG_ATUALIZOU = 1;
+            }
             reinicia_vars_centroide(centroide);
         }
     }
