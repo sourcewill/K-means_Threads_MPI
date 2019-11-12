@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
-#include <time.h>
+#include <limits.h>
 
 
 // STRUCTS
@@ -156,7 +156,7 @@ int distacia_centroide_ponto(CENTROIDE centroide, PONTO ponto){
 void atualiza_centroide_mais_proximo(PONTO* ponto){
 
     CENTROIDE* centroide;
-    int i, distancia_atual, menor_distancia = 999999999, indice;
+    int i, distancia_atual, menor_distancia = INT_MAX, indice;
 
     for(i=0; i<NUM_CENTROIDES; i++){
         distancia_atual = distacia_centroide_ponto(CENTROIDES[i], *ponto);

@@ -3,7 +3,7 @@
 #include <math.h>
 #include <string.h>
 #include <pthread.h>
-#include <time.h>
+#include <limits.h>
 
 
 // STRUCTS
@@ -159,7 +159,7 @@ int distacia_centroide_ponto(CENTROIDE centroide, PONTO ponto){
 void atualiza_centroide_mais_proximo(PONTO *ponto){
 
     CENTROIDE* centroide;
-    int i, distancia_atual, menor_distancia = 999999999, indice;
+    int i, distancia_atual, menor_distancia = INT_MAX, indice;
 
     for(i=0; i<NUM_CENTROIDES; i++){
         distancia_atual = distacia_centroide_ponto(CENTROIDES[i], *ponto);
@@ -218,7 +218,11 @@ void* K_means(void* arg){
 
     printf("\nThread(%ld) processando algoritmo K-means...", id_thread);
 
-    do{
+    while(FLAG_ATUALIZOU){
+
+        // BARREIRA
+        pthread_barrier_wait(&BARREIRA);
+
         FLAG_ATUALIZOU = 0;
 
         for(i = id_thread; i<NUM_PONTOS; i += NTH){
@@ -239,7 +243,7 @@ void* K_means(void* arg){
 
         // BARREIRA
         pthread_barrier_wait(&BARREIRA);
-    } while(FLAG_ATUALIZOU);
+    }
 
     pthread_exit(0);
 }
