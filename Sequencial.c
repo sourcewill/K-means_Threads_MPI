@@ -9,8 +9,8 @@
 typedef struct{
     int * coordenadas;
     int id;
-    int * soma_pontos_associados;
-    int num_associados;
+    int * soma_pontos_associados; // Acumula as coordenadas dos pontos associados a este centroide
+    int num_associados; // Acumula o numero de pontos associados a este centroide
 }CENTROIDE;
 
 typedef struct{
