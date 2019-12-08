@@ -3,7 +3,7 @@
 #include <math.h>
 #include <string.h>
 #include <limits.h>
-
+#include <time.h>
 
 // STRUCTS
 typedef struct{
@@ -207,6 +207,7 @@ void K_means(){
 
     int i, FLAG_ATUALIZOU = 1;
     CENTROIDE* centroide;
+    clock_t start = clock();
 
     printf("\nProcessando algoritmo K-means sequencial...");
 
@@ -227,6 +228,8 @@ void K_means(){
             reinicia_vars_centroide(centroide);
         }
     }
+
+    printf("\nProcessou por %f segundos", ((double)(clock() - start))/CLOCKS_PER_SEC);
 }
 
 

@@ -4,7 +4,7 @@
 #include <string.h>
 #include <pthread.h>
 #include <limits.h>
-
+#include <time.h>
 
 // STRUCTS
 typedef struct{
@@ -19,6 +19,11 @@ typedef struct{
     int id_centroide;
 }PONTO;
 
+typedef struct{
+    clock_t start, end;
+} INTERVAL;
+
+INTERVAL *thread_intervals;
 
 // GLOBAL
 int geraId = 0, BASE, NUM_CENTROIDES = 0, NUM_PONTOS = 0, FLAG_ATUALIZOU = 1, NTH;
@@ -217,6 +222,7 @@ void* K_means(void* arg){
     id_thread = (long int) arg;
 
     printf("\nThread(%ld) processando algoritmo K-means...", id_thread);
+    thread_intervals[id_thread].start = clock();
 
     while(FLAG_ATUALIZOU){
 
@@ -244,6 +250,10 @@ void* K_means(void* arg){
         // BARREIRA
         pthread_barrier_wait(&BARREIRA);
     }
+
+    thread_intervals[id_thread].end = clock();
+
+    printf("\nThread(%ld) processou por %f segundos", id_thread, ((double)(thread_intervals[id_thread].end - thread_intervals[id_thread].start))/CLOCKS_PER_SEC);
 
     pthread_exit(0);
 }
@@ -273,6 +283,8 @@ int main(int argc, char* argv[]){
     pthread_barrier_init(&BARREIRA,NULL,NTH);
     pthread_t* threads = (pthread_t *) malloc(NTH * sizeof(pthread_t));
 
+    thread_intervals = (INTERVAL*) malloc(NTH * sizeof(INTERVAL));
+
     long int i;
     for(i=0; i<NTH; i++){
         pthread_create(&threads[i],NULL,K_means,(void*)i);
@@ -281,6 +293,8 @@ int main(int argc, char* argv[]){
     for(i=0;i<NTH;i++){
         pthread_join(threads[i],NULL);
     }
+
+    printf("\nTempo total de execução: %f\n", ((double)(thread_intervals[NTH -1].end - thread_intervals[0].start))/CLOCKS_PER_SEC);
 
     strcat(nome_arq_saida, argv[1]);
     arq_saida = fopen(nome_arq_saida, "w");
