@@ -229,7 +229,11 @@ void K_means(){
         }
     }
 
-    printf("\nProcessou por %f segundos", ((double)(clock() - start))/CLOCKS_PER_SEC);
+    double totalTimeElapsedProcessing = ((double) (clock() - start)) / CLOCKS_PER_SEC;
+    printf("\nProcessou por %f segundos", totalTimeElapsedProcessing);
+
+    FILE *arq_times = fopen("times.txt", "a");
+    fprintf(arq_times, "%f\n", totalTimeElapsedProcessing);
 }
 
 
