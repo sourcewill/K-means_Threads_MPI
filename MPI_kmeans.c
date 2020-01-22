@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
-#include <pthread.h>
 #include <limits.h>
 #include <stddef.h>
 
@@ -267,8 +266,6 @@ void broadcast_centroides(){
         MPI_Bcast(&CENTROIDES[i].num_associados, 1, MPI_INT, PROCESSO_CENTRAL, MPI_COMM_WORLD);
         for(j=0; j<BASE; j++){
             MPI_Bcast(&CENTROIDES[i].soma_pontos_associados[j], 1, MPI_INT, PROCESSO_CENTRAL, MPI_COMM_WORLD);
-        }
-        for(j=0; j<BASE; j++){
             MPI_Bcast(&CENTROIDES[i].coordenadas[j], 1, MPI_INT, PROCESSO_CENTRAL, MPI_COMM_WORLD);
         }
     }
@@ -320,7 +317,7 @@ void K_means(){
 
         // Broadcast para atualizar a flag nos processos servos
         MPI_Bcast(&FLAG_ATUALIZOU, 1, MPI_INT, PROCESSO_CENTRAL, MPI_COMM_WORLD);
-
+        
         broadcast_centroides();
 
         MPI_Barrier(MPI_COMM_WORLD);
